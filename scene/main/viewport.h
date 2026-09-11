@@ -103,6 +103,7 @@ public:
 		SCALING_3D_MODE_FSR2,
 		SCALING_3D_MODE_METALFX_SPATIAL,
 		SCALING_3D_MODE_METALFX_TEMPORAL,
+		SCALING_3D_MODE_NEAREST,
 		SCALING_3D_MODE_MAX
 	};
 
@@ -184,6 +185,8 @@ public:
 		DEBUG_DRAW_OCCLUDERS,
 		DEBUG_DRAW_MOTION_VECTORS,
 		DEBUG_DRAW_INTERNAL_BUFFER,
+		DEBUG_DRAW_CLUSTER_AREA_LIGHTS,
+		DEBUG_DRAW_AREA_LIGHT_ATLAS,
 	};
 
 	enum DefaultCanvasItemTextureFilter {
@@ -286,6 +289,8 @@ private:
 
 	bool handle_input_locally = true;
 	bool local_input_handled = false;
+	bool propagate_shortcuts_to_parent = false;
+	bool shortcut_use_focus_owner = true;
 
 	Ref<World2D> world_2d;
 
@@ -441,6 +446,7 @@ private:
 	void _perform_drop(Control *p_control = nullptr);
 	void _gui_cleanup_internal_state(Ref<InputEvent> p_event);
 
+	void _push_shortcut_input_internal(const Ref<InputEvent> &p_event);
 	void _push_unhandled_input_internal(const Ref<InputEvent> &p_event);
 
 	Ref<InputEvent> _make_input_local(const Ref<InputEvent> &ev);
@@ -624,9 +630,9 @@ public:
 
 	void _push_text_input(const String &p_text, bool p_emit_text_changed_signal = false);
 	void push_text_input(const String &p_text);
-	void push_input(RequiredParam<InputEvent> rp_event, bool p_local_coords = false);
+	void push_input(RequiredParam<InputEvent> p_event, bool p_local_coords = false);
 #ifndef DISABLE_DEPRECATED
-	void push_unhandled_input(RequiredParam<InputEvent> rp_event, bool p_local_coords = false);
+	void push_unhandled_input(RequiredParam<InputEvent> p_event, bool p_local_coords = false);
 #endif // DISABLE_DEPRECATED
 	void notify_mouse_entered();
 	void notify_mouse_exited();
@@ -683,6 +689,9 @@ public:
 
 	void set_handle_input_locally(bool p_enable);
 	bool is_handling_input_locally() const;
+
+	void set_propagate_shortcuts_to_parent(bool p_enable);
+	bool gui_shortcut_use_focus_owner() const;
 
 	bool gui_is_dragging() const;
 	bool gui_is_drag_successful() const;
@@ -772,6 +781,7 @@ private:
 	};
 #endif // DEBUG_ENABLED
 
+#ifndef _2D_DISABLED
 	// 2D audio, camera, and physics. (don't put World2D here because World2D is needed for Control nodes).
 	friend class AudioListener2D; // Needs _audio_listener_2d_set and _audio_listener_2d_remove
 	AudioListener2D *audio_listener_2d = nullptr;
@@ -802,6 +812,7 @@ private:
 	// Cleans up colliders corresponding to old frames or all of them.
 	void _cleanup_mouseover_colliders(bool p_clean_all_frames, bool p_paused_only, uint64_t p_frame_reference = 0);
 #endif // PHYSICS_2D_DISABLED
+#endif // _2D_DISABLED
 
 public:
 	AudioListener2D *get_audio_listener_2d() const;

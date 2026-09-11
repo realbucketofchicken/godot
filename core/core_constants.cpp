@@ -31,8 +31,7 @@
 #include "core_constants.h"
 
 #include "core/input/input_enums.h"
-#include "core/object/method_bind.h" // IWYU pragma: keep. To bind `MethodFlags`.
-#include "core/object/object.h"
+#include "core/object/method_bind_common.h" // IWYU pragma: keep. For `VARIANT_BITFIELD_CAST(MethodFlags)`.
 #include "core/os/keyboard.h"
 #include "core/variant/type_info.h"
 #include "core/variant/variant.h"
@@ -689,6 +688,7 @@ void register_global_constants() {
 	BIND_CORE_ENUM_CONSTANT(PROPERTY_HINT_GROUP_ENABLE);
 	BIND_CORE_ENUM_CONSTANT(PROPERTY_HINT_INPUT_NAME);
 	BIND_CORE_ENUM_CONSTANT(PROPERTY_HINT_FILE_PATH);
+	BIND_CORE_ENUM_CONSTANT(PROPERTY_HINT_AUDIO_BUS);
 	BIND_CORE_ENUM_CONSTANT(PROPERTY_HINT_MAX);
 
 	BIND_CORE_BITFIELD_FLAG(PROPERTY_USAGE_NONE);

@@ -324,6 +324,9 @@ class TextServerAdvanced : public TextServerExtension {
 		PackedColorArray palette_custom_colors;
 		Vector<hb_color_t> palette_custom_colors_hb;
 		unsigned int palette_index = 0;
+
+		hb_raster_paint_t *hb_rdr = nullptr;
+		hb_raster_draw_t *hb_mono = nullptr;
 #endif
 
 		bool face_init = false;
@@ -351,6 +354,14 @@ class TextServerAdvanced : public TextServerExtension {
 				memdelete(E.value);
 			}
 			cache.clear();
+#if HB_VERSION_ATLEAST(13, 0, 0)
+			if (hb_rdr != nullptr) {
+				hb_raster_paint_destroy(hb_rdr);
+			}
+			if (hb_mono != nullptr) {
+				hb_raster_draw_destroy(hb_mono);
+			}
+#endif
 #ifdef MODULE_FREETYPE_ENABLED
 			if (face != nullptr) {
 				FT_Done_Face(face);
@@ -558,9 +569,7 @@ class TextServerAdvanced : public TextServerExtension {
 					ubidi_close(bidi_iter[i]);
 				}
 			}
-			if (script_iter) {
-				memdelete(script_iter);
-			}
+			memdelete(script_iter);
 			if (hb_buffer) {
 				hb_buffer_destroy(hb_buffer);
 			}
@@ -571,12 +580,7 @@ class TextServerAdvanced : public TextServerExtension {
 
 	mutable RID_PtrOwner<FontAdvancedLinkedVariation> font_var_owner;
 	mutable RID_PtrOwner<FontAdvanced> font_owner;
-	mutable RID_PtrOwner<ShapedTextDataAdvanced> shaped_owner;
-
-#if HB_VERSION_ATLEAST(13, 0, 0)
-	hb_raster_paint_t *hb_rdr = nullptr;
-	hb_raster_draw_t *hb_mono = nullptr;
-#endif
+	mutable RID_PtrOwner<ShapedTextDataAdvanced> shaped_owner{ 65536, 1048576 };
 
 	_FORCE_INLINE_ FontAdvanced *_get_font_data(const RID &p_font_rid) const {
 		RID rid = p_font_rid;
@@ -755,7 +759,8 @@ class TextServerAdvanced : public TextServerExtension {
 			return RID();
 		}
 	};
-	void _shape_run(ShapedTextDataAdvanced *p_sd, int64_t p_start, int64_t p_end, const String &p_language, hb_script_t p_script, hb_direction_t p_direction, FontPriorityList &p_fonts, int64_t p_span, int64_t p_fb_index, int64_t p_prev_start, int64_t p_prev_end, RID p_prev_font);
+	_FORCE_INLINE_ int _find_span(ShapedTextDataAdvanced *p_sd, int64_t p_index, int64_t p_span_start, int64_t p_span_end);
+	void _shape_run(ShapedTextDataAdvanced *p_sd, int64_t p_start, int64_t p_end, const String &p_language, hb_script_t p_script, hb_direction_t p_direction, FontPriorityList &p_fonts, int64_t p_span_start, int64_t p_span_end, int64_t p_fb_index, int64_t p_prev_start, int64_t p_prev_end, RID p_prev_font);
 	Glyph _shape_single_glyph(ShapedTextDataAdvanced *p_sd, char32_t p_char, hb_script_t p_script, hb_direction_t p_direction, const RID &p_font, int64_t p_font_size);
 	_FORCE_INLINE_ RID _find_sys_font_for_text(const RID &p_fdef, const String &p_script_code, const String &p_language, const String &p_text);
 
@@ -813,6 +818,7 @@ protected:
 public:
 	MODBIND1RC(bool, has_feature, Feature);
 	MODBIND0RC(String, get_name);
+	MODBIND0RC(String, get_short_name);
 	MODBIND0RC(int64_t, get_features);
 
 	MODBIND1(free_rid, const RID &);
