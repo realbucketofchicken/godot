@@ -40,6 +40,7 @@
 #include "scene/gui/tree.h"
 
 class ImageTexture;
+class ColorRect;
 
 class EditorProfiler : public VBoxContainer {
 	GDCLASS(EditorProfiler, VBoxContainer);
@@ -100,6 +101,7 @@ private:
 	Button *activate = nullptr;
 	Button *clear_button = nullptr;
 	TextureRect *graph = nullptr;
+	ColorRect *graph_background = nullptr;
 	Ref<ImageTexture> graph_texture;
 	Vector<uint8_t> graph_image;
 
@@ -111,6 +113,7 @@ private:
 	HSplitContainer *h_split = nullptr;
 
 	HashSet<StringName> plot_sigs;
+	HashSet<StringName> collapsed_categories;
 
 	OptionButton *display_mode = nullptr;
 	OptionButton *display_time = nullptr;
@@ -147,6 +150,7 @@ private:
 
 	void _make_metric_ptrs(Metric &m);
 	void _item_edited();
+	void _item_collapsed(TreeItem *p_item);
 
 	void _update_plot();
 
@@ -162,7 +166,7 @@ private:
 
 	void _combo_changed(int);
 
-	Metric _get_frame_metric(int index);
+	const Metric &_get_frame_metric(int index) const;
 
 protected:
 	void _notification(int p_what);

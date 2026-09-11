@@ -31,9 +31,8 @@
 #pragma once
 
 #include "audio_driver_web.h"
-#include "webmidi_driver.h"
-
 #include "godot_js.h"
+#include "webmidi_driver.h"
 
 #include "core/input/input_event.h"
 #include "drivers/unix/os_unix.h"
@@ -108,6 +107,8 @@ public:
 	String get_user_data_dir(const String &p_user_dir) const override;
 
 	bool is_userfs_persistent() const override;
+
+	Error get_entropy(uint8_t *r_buffer, int p_bytes) override;
 
 	void alert(const String &p_alert, const String &p_title = "ALERT!") override;
 

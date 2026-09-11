@@ -65,7 +65,6 @@ private:
 	bool scrolling_to_item = false;
 	bool notify_selection_queued = false;
 	bool selection_surpassed_limit = false;
-	bool selection_uncollapse_all = false;
 	HashSet<ObjectID> unfold_cache;
 	HashSet<ObjectID> selection_cache;
 	PopupMenu *item_menu = nullptr;
@@ -98,7 +97,7 @@ public:
 	void update_icon_max_width();
 	String get_selected_path();
 	ObjectID get_selected_object();
-	int get_current_debugger(); // Would love to have one tree for every debugger.
+	int get_current_debugger() { return debugger_id; }
 	inline TypedArray<uint64_t> get_selection() const { return inspected_object_ids.duplicate(); }
 	void update_scene_tree(const SceneDebuggerTree *p_tree, int p_debugger);
 	void select_nodes(const TypedArray<int64_t> &p_ids);
